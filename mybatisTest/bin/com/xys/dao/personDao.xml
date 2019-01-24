@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.xys.dao.PersonDao">
+  <resultMap type="Person" id="personMap">
+  	<!-- 分段查询 -->
+  	<result column="id" property="id"/>
+  	<result column="age" property="age"/>
+  	<result column="name" property="name"/>
+  	<result column="salary" property="salary"/>
+  	<result column="registerTime" property="registerTime"/>
+  	<result column="birth" property="birth"/>
+  	<result column="courseid" property="courseid"/>
+  	<association property="course" javaType="com.xys.model.Course" column="courseid"
+  	select="com.xys.dao.CourseDao.getInfo" ></association>
+  </resultMap>
+  	<select id="getInfo" resultType="Person">
+  		select *  from  tbl_person
+  		<where>
+  		  <if test="name!='' and name !=null">
+  		    name=#{name}
+  		  </if>
+  		
+  		</where>
+  	</select>
+  	
+  	<select id="getInfo1" resultMap="personMap">
+  		select *  from  tbl_person
+  	</select>
+  
+   </mapper>

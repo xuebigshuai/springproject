@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+    <!--通过属性来复制  set注入  -->
+	<bean id="person1" class="com.xys.model.Person" primary="true">
+		<property name="name" value="薛大帅"/>
+		<property name="sex" value="男"/>
+		<property name="salary" value="222.33"></property>
+	</bean>
+	<bean id="person2" class="com.xys.model.Person">
+		<property name="name" value="薛二帅"/>
+		<property name="sex" >
+				<null/>
+		</property>
+		<property name="salary" value="22222.33"/>
+		<property name="booklist">
+			<list>
+			  <ref bean="book1"/>
+			  <bean class="com.xys.model.Book" p:name="水浒传" p:price="12" /> 
+			</list>
+		</property>
+		<property name="map">
+		   <map>
+		     <entry key="school" value="长安大学"></entry>
+		     <entry key="person" value-ref="person1"></entry>
+		   </map>
+		</property>
+		<property name="properties">
+			<props>
+			  <prop key="area" >西安</prop>
+			  <prop key="job" >软件工程师</prop>
+			</props>
+		</property>
+	</bean>
+	<bean id="book1" class="com.xys.model.Book">
+		<constructor-arg name="name" value="西游记"/>
+		<constructor-arg name="price" value="121"/>
+	</bean>
+	
+	<bean id="person3" class="com.xys.model.Person">
+		<property name="name" value="薛大帅"/>
+		<property name="sex" value="男"/>
+		<property name="salary" value="222.33"></property>
+		<property name="booklist" ref="mylist"></property>
+		<property name="map" ref="mymap"></property>
+	</bean>
+	
+	<!-- 这个相当于创建了一个list  为  ArrayList  -->
+	<util:list id="mylist">
+		 <ref bean="book1"/>
+	     <bean class="com.xys.model.Book" p:name="水浒传" p:price="12" /> 
+	</util:list>
+	
+	<!-- 这个相当于创建了一个map 为LinkedHashMap  -->
+	<util:map id="mymap">
+	  <description>描述</description>
+	  <entry>
+	  	<key><value>school</value></key>
+	  	<value>长安大学</value>
+	  </entry>
+	  <entry key="person" value-ref="person2"/>
+	</util:map>
+	
+	<!-- 静态工厂法创建对象 
+		class:静态工厂的全类名
+	-->
+	<bean id="book5"
+	 class="com.xys.factory.MyBookStaticFactory" factory-method="getBook">
+	 </bean>
+	<bean id="book2"
+	 class="com.xys.factory.MyBookStaticFactory" factory-method="getBook">
+	   <constructor-arg name="name" value="薛煜帅传奇"/>
+	 </bean>
+	 <bean id="book3"
+	 class="com.xys.factory.MyBookStaticFactory" factory-method="getBook">
+	   <constructor-arg name="price" value="19999"/>
+	 </bean>
+	 <bean id="book4"
+	 class="com.xys.factory.MyBookStaticFactory" factory-method="getBook">
+	   <constructor-arg name="price" value="19999"/>
+	   <constructor-arg value="薛煜帅传" index="0"/>
+	 </bean>
+	 <!-- 通过实例化工厂创建bean
+	 		class:要创建出来的对象
+	  -->
+	 <!-- 实例化工厂 -->
+	 <bean id="bookFactory"
+	  class="com.xys.factory.MyBookInstaceFactory"/>
+	  <bean id="book6"
+	        class="com.xys.model.Book" factory-bean="bookFactory" factory-method="getBook">
+	        <constructor-arg>
+	           <value>《瞅一瞅》</value>
+	        </constructor-arg>
+	  </bean>
+	  <!-- 实现FactoryBean接口来创建实例
+		class:实现FactoryBean的类	  
+	   -->
+	   <bean id="book7" class="com.xys.factory.MyBookFactoryImpleFactoryBean"></bean>
+	   <!-- Bean的生命周期
+	      1）对于单实例对象（spring默认的情况下，整个容器中就这一个Bean  scope=“singleton”）
+	   		创建：在容器启动时就创建对象
+	   		初始化：对象创建完成之后进行初始化
+	   		销毁：容器关闭后调用
+	   		
+	   	  2）对于多例(scope=prototype)
+	   	    创建：调用时才创建；
+	   	    初始化：创建完后初始化前调用 init-method；
+	   	    销毁：不销毁。destroy-method容器的底层不会保存多实例创建的对象，它只会销毁它自己保存的对象
+	    -->
+       <bean id="book8" class="com.xys.model.Book" init-method="initBook" destroy-method="destroyBook"
+              scope="prototype">
+       </bean>	    
+      	   
+	   <!-- bean的后置处理器  实先 BeanPostProcessor接口
+	   		作用时机：
+	   		     bean被创建后即构造器调用后，在bean 创建完初始化前后进行访问
+	    -->
+	    <bean class="com.xys.factory.BeanPostImple"/>
+	        
+
+</beans>
